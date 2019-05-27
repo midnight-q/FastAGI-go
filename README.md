@@ -1,13 +1,13 @@
 # FastAGI-go
 Asterisk FastAGI server for GoLang
 
-###1. Install
+### Install
 
 ```
 go get https://github.com/BlayD91/FastAGI-go
 ```
 
-###2. Usage
+### Usage
 
 ```
 import "time"
