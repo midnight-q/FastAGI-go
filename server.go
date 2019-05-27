@@ -23,6 +23,11 @@ type Server struct {
 	handlers   map[string]Route
 }
 
+//NewServer
+func NewServer(addr string, idleTimeout time.Duration, maxReadBytes int64) *Server {
+	return &Server{Addr: addr, IdleTimeout: idleTimeout, MaxReadBytes: maxReadBytes}
+}
+
 type Route func(Request)
 
 func (srv *Server) AddRoute(name string, route Route) error {
