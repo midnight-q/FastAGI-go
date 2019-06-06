@@ -9,7 +9,7 @@ go get https://github.com/BlayD91/FastAGI-go
 
 ### Usage
 
-```
+```go
 import "time"
 
 func callHandler(r Request) {
