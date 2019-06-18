@@ -15,17 +15,11 @@ type Server struct {
 	IdleTimeout  time.Duration
 	MaxReadBytes int64
 
-	listener net.Listener
-	conns    map[*conn]struct{}
-	mu       sync.Mutex
-
+	listener   net.Listener
+	conns      map[*conn]struct{}
+	mu         sync.Mutex
 	inShutdown bool
 	handlers   map[string]Route
-}
-
-//NewServer
-func NewServer(addr string, idleTimeout time.Duration, maxReadBytes int64) *Server {
-	return &Server{Addr: addr, IdleTimeout: idleTimeout, MaxReadBytes: maxReadBytes}
 }
 
 type Route func(Request)
@@ -65,7 +59,7 @@ func (srv *Server) ListenAndServe() {
 			log.Printf("error accepting connection %v", err)
 			continue
 		}
-		log.Printf("accepted connection from %v", newConn.RemoteAddr())
+		//log.Printf("accepted connection from %v", newConn.RemoteAddr())
 		conn := &conn{
 			Conn:          newConn,
 			IdleTimeout:   srv.IdleTimeout,
@@ -89,7 +83,7 @@ func (srv *Server) trackConn(c *conn) {
 
 func (srv *Server) handle(conn *conn) {
 	defer func() {
-		log.Printf("closing connection from %v", conn.RemoteAddr())
+		//log.Printf("closing connection from %v", conn.RemoteAddr())
 		_ = conn.Close()
 		srv.deleteConn(conn)
 	}()
@@ -103,10 +97,7 @@ func (srv *Server) handle(conn *conn) {
 		go func(s chan bool) {
 			s <- scanner.Scan()
 		}(sc)
-		deadline := time.After(conn.IdleTimeout)
 		select {
-		case <-deadline:
-			return
 		case scanned := <-sc:
 			if !scanned {
 				if err := scanner.Err(); err != nil {
@@ -116,7 +107,7 @@ func (srv *Server) handle(conn *conn) {
 			}
 			if scanner.Text() == "" {
 				data := ParseText(str.String())
-				request := Request{data, w}
+				request := Request{data, w, r}
 				route, isExist := data["agi_network_script"]
 				if !isExist {
 					return
